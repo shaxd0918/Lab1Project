@@ -1,0 +1,82 @@
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get tasks from user
+        System.out.print("Enter tasks (comma-separated): ");
+        String tasksRaw = scanner.nextLine();
+        List<String> tasks = new ArrayList<>();
+        for (String t : tasksRaw.split(",")) {
+            t = t.trim();
+            if (!t.isEmpty()) {
+                tasks.add(t);
+            }
+        }
+
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks.");
+            return;
+        }
+
+        // Get number of team members
+        System.out.print("Number of team members: ");
+        int members;
+        try {
+            members = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid team size.");
+            return;
+        }
+
+        if (members <= 0) {
+            System.out.println("Invalid team size.");
+            return;
+        }
+
+        // Optional max tasks per member
+        System.out.print("Max tasks per member (optional, press Enter to skip): ");
+        String maxStr = scanner.nextLine().trim();
+        Integer maxPer = null;
+
+        if (!maxStr.isEmpty()) {
+            try {
+                int val = Integer.parseInt(maxStr);
+                if (val > 0) {
+                    maxPer = val;
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (maxPer != null) {
+            int totalTasks = tasks.size();
+            int requiredMembers = (int) Math.ceil((double) totalTasks / maxPer);
+            if (members < requiredMembers) {
+                System.out.println("Increasing team size from " + members + " to " + requiredMembers + " to respect max limit.");
+                members = requiredMembers;
+            }
+        }
+
+        // Distribute tasks
+        List<List<String>> distribution = new ArrayList<>();
+        for (int i = 0; i < members; i++) {
+            distribution.add(new ArrayList<>());
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            distribution.get(i % members).add(tasks.get(i));
+        }
+
+        // Output
+        System.out.println("\nTotal tasks: " + tasks.size());
+        System.out.println("Team members: " + members);
+        System.out.println("=".repeat(30));
+
+        for (int i = 0; i < distribution.size(); i++) {
+            List<String> bucket = distribution.get(i);
+            System.out.println("Member " + (i + 1) + " (" + bucket.size() + " tasks): " + bucket);
+        }
+    }
+}
